@@ -23,7 +23,7 @@ const double Lf = 2.67;
 
 // Both the reference cross track and orientation errors are 0.
 // The reference velocity is set to 80 mph.
-double ref_v = 80;
+double ref_v = 100;
 
 // The solver takes all the state variables and actuator
 // variables in a singular vector. Thus, we should to establish
@@ -51,7 +51,7 @@ class FG_eval {
     fg[0] = 0;
 
     // MPC weights = {cte, epsi, v, delta, accel, ddelta, jerk}
-    std::vector<double> weights = {25, 10000, 1, 1000, 1, 1000, 1};
+    std::vector<double> weights = {25, 50000, 1, 1000, 1, 1000, 1, 1000};
 
     // The part of the cost based on the reference state.
     for (int t = 0; t < N; t++) {
@@ -64,7 +64,7 @@ class FG_eval {
     for (int t = 0; t < N - 1; t++) {
       fg[0] += weights[3] * CppAD::pow(vars[delta_start + t], 2);
       fg[0] += weights[4] * CppAD::pow(vars[a_start + t], 2);
-//      fg[0] += 1000 * CppAD::pow(vars[delta_start + t] * vars[a_start + t], 2);
+      fg[0] += weights[7] * CppAD::pow(vars[delta_start + t] * vars[a_start + t], 2);
     }
 
     // Minimize the value gap between sequential actuations.

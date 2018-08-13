@@ -68,7 +68,7 @@ For the simulation, my final selection for N and dt was 15 and 100 ms respective
 
 As a starting point, I began with the values used in the "MPC Quizzes" (25, 50 ms). While running the simulation, it was clear that a timestep of 50 ms was much too frequent relative to the distance covered by the vehicle. This was causing undue processing overhead without contributing a performance increase, so I increased the timestep to 100 ms.
 
-After increasing the timestep, I decided to fit the horizon to a value which would capture the upcoming road geometry while balancing processing costs. Starting with the MPC Quizzes value of 25 iterations, I realized that this was looking too far into the future for the the set speed that I was planning to operate the simulation at (80 mph). The first problem with this is the processing cost of looking that far ahead. The second is that there is an inverse correlation between the length of the horizon and the accuracy of a curve fit over that length. Working my way down form 25 iterations, I found that a horizon of 15 iterations fully captured a single curve on the test track.
+After increasing the timestep, I decided to fit the horizon to a value which would capture the upcoming road geometry while balancing processing costs. Starting with the MPC Quizzes value of 25 iterations, I realized that this was looking too far into the future for the the set speed that I was planning to operate the simulation at (80 mph). The first problem with this is the processing cost of looking that far ahead. The second is that there is an inverse correlation between the length of the horizon and the accuracy of a curve fit over that length. Working my way down form 25 iterations, I found that a horizon of 10 iterations fully captured a single curve on the test track.
 
 ### Polynomial Fitting and MPC Preprocessing
 
@@ -94,7 +94,9 @@ cte[t+1] = cte[t] + (v[t] * sin(epsi[t]) * dt);
 
 epsi[t+1] = epsi[t] - v[t] * delta[t] / Lf * dt;
 
-In total, the variable constraints I used were cte, epsi, v, delta, accel, ddelta, and jerk. I prioritized a high weight on epsi, delta, and ddelta (the rate change of delta). This prioritized smooth steering over other parameters. Velocity, acceleration, and jerk were all minimally weighted so that the vehicle would tolerate changing speed to accommodate the other constraints. The CTE was tuned up just slightly so that the vehicle would try to stay centered.
+In total, the variable constraints I used were cte, epsi, v, delta, accel, ddelta, and jerk. I prioritized a very high weight on epsi (50000) since that seemed to help significantly in curves both by slowing the vehicle and cornering correctly. Delta and ddelta (the rate change of delta) had a medium weight to prioritized smooth steering over other parameters (1000, 1000). The CTE was tuned just slightly so that the vehicle would try to stay centered (25). Velocity, acceleration, and jerk were all minimally weighted so that the vehicle would tolerate changing speed to accommodate the other constraints (1, 1, 1).
+
+Per the advice of the Slack forums, I also included a constraint to minimize acceleration while turning -> (accel*delta)^2. This helped to slow down the vehicle additionally in curves and was set to a weight of 1000.
 
 #### Latency
 
@@ -106,11 +108,4 @@ The drawback of this method is that the kinematic bicycle model does not predict
 
 ### Conclusion
 
-In the end I was able to drive the vehicle around the track using Model Predictive Control. If I were to further improve this process, I would include a module to adjust vehicle speed setpoint based on upcoming road curvature. Much like a normal driver does, when a curve appears ahead I would have the vehicle slow down ahead of the curve.
-
-Note: regardless of the changes you make, your project must be buildable using
-cmake and make!
-
-More information is only accessible by people who are already enrolled in Term 2
-of CarND. If you are enrolled, see [the project page](https://classroom.udacity.com/nanodegrees/nd013/parts/40f38239-66b6-46ec-ae68-03afd8a601c8/modules/f1820894-8322-4bb3-81aa-b26b3c6dcbaf/lessons/b1ff3be0-c904-438e-aad3-2b5379f0e0c3/concepts/1a2255a0-e23c-44cf-8d41-39b8a3c8264a)
-for instructions and the project rubric.
+In the end I was able to drive the vehicle around the track at a set speed of 100 mph. If I were to further improve this process, I would include a module to adjust vehicle speed set point based on upcoming road curvature. Much like a normal driver does, when a curve appears ahead I would have the vehicle slow down ahead of the curve.
