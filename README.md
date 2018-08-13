@@ -64,11 +64,11 @@ Where x is the vehicle's longitudinal position, y is the vehicle's lateral posit
 
 ### Timestep Length and Elapsed Duration (N & dt)
 
-For the simulation, my final selection for N and dt was 15 and 100 ms respectively.
+For the simulation, my final selection for N and dt was 10 and 100 ms respectively.
 
 As a starting point, I began with the values used in the "MPC Quizzes" (25, 50 ms). While running the simulation, it was clear that a timestep of 50 ms was much too frequent relative to the distance covered by the vehicle. This was causing undue processing overhead without contributing a performance increase, so I increased the timestep to 100 ms.
 
-After increasing the timestep, I decided to fit the horizon to a value which would capture the upcoming road geometry while balancing processing costs. Starting with the MPC Quizzes value of 25 iterations, I realized that this was looking too far into the future for the the set speed that I was planning to operate the simulation at (80 mph). The first problem with this is the processing cost of looking that far ahead. The second is that there is an inverse correlation between the length of the horizon and the accuracy of a curve fit over that length. Working my way down form 25 iterations, I found that a horizon of 10 iterations fully captured a single curve on the test track.
+After increasing the timestep, I decided to fit the horizon to a value which would capture the upcoming road geometry while balancing processing costs. Starting with the MPC Quizzes value of 25 iterations, I realized that this was looking too far into the future for the the set speed that I was planning to operate the simulation at (80 mph). The first problem with this is the processing cost of looking that far ahead. The second is that there is an inverse correlation between the length of the horizon and the accuracy of a curve fit over that length. Working my way down from 25 iterations, I found that a horizon of 10 iterations fully captured a single curve on the test track.
 
 ### Polynomial Fitting and MPC Preprocessing
 
